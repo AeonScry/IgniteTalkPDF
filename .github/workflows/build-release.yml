@@ -1,0 +1,67 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -switch /Applications/Xcode.app/Contents/Developer
+
+      - name: Build app
+        run: |
+          xcodebuild \
+            -project IgniteTalkPDF.xcodeproj \
+            -scheme IgniteTalkPDF \
+            -configuration Release \
+            -derivedDataPath .build/derivedData \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: Package app
+        run: |
+          mkdir -p dist
+          ditto -c -k --sequesterRsrc --keepParent \
+            .build/derivedData/Build/Products/Release/IgniteTalkPDF.app \
+            "dist/IgniteTalkPDF-${{ github.ref_name || github.sha }}.zip"
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: IgniteTalkPDF-build
+          path: dist/*.zip
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: IgniteTalkPDF-build
+          path: dist
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: ${{ github.ref_name }}
+        run: |
+          set -e
+          ls -la dist
+          gh release create "${TAG_NAME}" dist/*.zip \
+            --title "${TAG_NAME}" \
+            --generate-notes
