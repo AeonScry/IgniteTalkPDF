@@ -83,6 +83,22 @@ The generated app bundle is placed under:
 .build/derivedData/Build/Products/Release/IgniteTalkPDF.app
 ```
 
+### First launch on macOS
+
+The GitHub Actions build is unsigned, so macOS may block it the first time it opens:
+
+1. Try to open `IgniteTalkPDF.app`, then click **Done** in the warning.
+2. Open **System Settings → Privacy & Security**.
+3. In the **Security** section, click **Open Anyway** for IgniteTalkPDF and confirm **Open**.
+
+If **Open Anyway** does not appear, remove the quarantine attribute in Terminal:
+
+```sh
+xattr -dr com.apple.quarantine /path/to/IgniteTalkPDF.app
+```
+
+Replace `/path/to/IgniteTalkPDF.app` with the app's actual location, then open it again.
+
 ## Notes
 
 - The app is intentionally PDF-only.
