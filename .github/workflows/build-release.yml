@@ -63,5 +63,6 @@ jobs:
           set -e
           ls -la dist
           gh release create "${TAG_NAME}" dist/*.zip \
+            --repo "${GITHUB_REPOSITORY}" \
             --title "${TAG_NAME}" \
             --generate-notes
