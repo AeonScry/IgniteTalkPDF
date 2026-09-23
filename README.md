@@ -90,5 +90,5 @@ The generated app bundle is placed under:
 - The project is configured to build as a universal binary for Intel and Apple Silicon Macs.
 
 **Author:** Jack Teoh  
-**Organization:** DevOpsDays  
+**Organization:** DevOpsDays Dallas  
 **Created with:** GitHub Copilot

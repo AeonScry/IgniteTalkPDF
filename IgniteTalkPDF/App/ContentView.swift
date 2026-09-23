@@ -84,7 +84,7 @@ struct ContentView: View {
             Text("PDF only • macOS 13+ • Press Escape during a presentation to exit fullscreen")
                 .font(.footnote)
                 .foregroundStyle(.tertiary)
-            Text("Jack Teoh • DevOpsDays")
+            Text("Jack Teoh • DevOpsDays Dallas")
                 .font(.footnote.weight(.medium))
                 .foregroundStyle(.secondary)
             Text("Created with GitHub Copilot")
