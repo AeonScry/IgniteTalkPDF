@@ -1,12 +1,12 @@
 # IgniteTalkPDF
 
-IgniteTalkPDF is a native macOS presentation app built for the Ignite format: a PDF with exactly 20 pages, displayed fullscreen at 15 seconds per page for a total of 5 minutes. After the final page, the DevOpsDays DFW brand logo appears as the closing slide.
+IgniteTalkPDF is a native macOS presentation app built for the Ignite format: a PDF with up to 20 pages, displayed fullscreen for a total of 5 minutes. Each slide receives an equal share of the presentation time. After the final page, the DevOpsDays DFW brand logo appears as the closing slide.
 
 ## Overview
 
 - Built with SwiftUI and PDFKit
 - Targets macOS 13 or newer
-- Uses a single fixed presentation timeline: 20 pages × 15 seconds
+- Uses a five-minute presentation timeline divided equally across 1 to 20 pages
 - Validates page count before starting a presentation
 - Supports both Intel and Apple Silicon Macs via a universal binary build
 - Includes a dependency-free timing model and test coverage
@@ -17,7 +17,7 @@ IgniteTalkPDF is a native macOS presentation app built for the Ignite format: a 
 flowchart TD
     A[User launches app] --> B[ContentView]
     B --> C[Choose PDF]
-    C --> D[Validate exactly 20 pages]
+    C --> D[Validate 1 to 20 pages]
     D --> E[PresentationSession]
     E --> F[PresentationTimeline]
     F --> G[Timer-driven page progression]
@@ -48,9 +48,9 @@ flowchart TD
 ## How it works
 
 - The user selects a PDF file.
-- The app validates that it contains exactly 20 pages.
+- The app validates that it contains between 1 and 20 pages.
 - A `PresentationSession` updates the `PresentationTimeline` based on system uptime.
-- The timeline advances 15 seconds per slide and controls pause/resume and navigation.
+- The timeline divides five minutes equally across the slides and controls pause/resume and navigation.
 - The app exits fullscreen with the Escape key and can restart the presentation at any time.
 
 The last-used PDF folder is remembered in `UserDefaults`, so the chooser reopens in the same directory next time.

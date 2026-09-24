@@ -8,8 +8,14 @@ public struct PresentationTimeline: Equatable, Sendable {
         case finished
     }
 
-    public static let pageCount = 20
-    public static let secondsPerPage: TimeInterval = 15
+    public static let defaultPageCount = 20
+    public static let maximumPageCount = 20
+    public static let totalDuration: TimeInterval = 300
+
+    public let pageCount: Int
+    public var secondsPerPage: TimeInterval {
+        Self.totalDuration / TimeInterval(pageCount)
+    }
 
     public private(set) var currentPage = 0
     public private(set) var phase: Phase = .idle
@@ -17,7 +23,13 @@ public struct PresentationTimeline: Equatable, Sendable {
     private var pageStartedAt: TimeInterval?
     private var elapsedBeforeStart: TimeInterval = 0
 
-    public init() {}
+    public init(pageCount: Int = Self.defaultPageCount) {
+        precondition(
+            pageCount > 0 && pageCount <= Self.maximumPageCount,
+            "A presentation must contain between one and 20 pages"
+        )
+        self.pageCount = pageCount
+    }
 
     public var pageNumber: Int {
         currentPage + 1
@@ -33,7 +45,7 @@ public struct PresentationTimeline: Equatable, Sendable {
 
     public func secondsRemaining(at now: TimeInterval) -> TimeInterval {
         guard phase != .finished else { return 0 }
-        return max(0, Self.secondsPerPage - elapsedOnCurrentPage(at: now))
+        return max(0, secondsPerPage - elapsedOnCurrentPage(at: now))
     }
 
     public mutating func start(at now: TimeInterval) {
@@ -74,11 +86,11 @@ public struct PresentationTimeline: Equatable, Sendable {
         guard phase == .running else { return }
 
         let elapsed = elapsedOnCurrentPage(at: now)
-        let pagesElapsed = Int(elapsed / Self.secondsPerPage)
+        let pagesElapsed = Int(elapsed / secondsPerPage)
         guard pagesElapsed > 0 else { return }
 
-        if currentPage + pagesElapsed >= Self.pageCount {
-            currentPage = Self.pageCount - 1
+        if currentPage + pagesElapsed >= pageCount {
+            currentPage = pageCount - 1
             elapsedBeforeStart = 0
             pageStartedAt = nil
             phase = .finished
@@ -86,7 +98,7 @@ public struct PresentationTimeline: Equatable, Sendable {
         }
 
         currentPage += pagesElapsed
-        elapsedBeforeStart = elapsed.truncatingRemainder(dividingBy: Self.secondsPerPage)
+        elapsedBeforeStart = elapsed.truncatingRemainder(dividingBy: secondsPerPage)
         pageStartedAt = now
     }
 
@@ -101,7 +113,7 @@ public struct PresentationTimeline: Equatable, Sendable {
 
     public mutating func next(at now: TimeInterval) {
         guard phase == .running || phase == .paused else { return }
-        if currentPage == Self.pageCount - 1 {
+        if currentPage == pageCount - 1 {
             elapsedBeforeStart = 0
             pageStartedAt = nil
             phase = .finished

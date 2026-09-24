@@ -4,12 +4,17 @@ import IgniteTalkCore
 @MainActor
 final class PresentationSession: ObservableObject {
     @Published private(set) var timeline = PresentationTimeline()
-    @Published private(set) var secondsRemaining = PresentationTimeline.secondsPerPage
+    @Published private(set) var secondsRemaining = PresentationTimeline().secondsPerPage
 
     var currentPage: Int { timeline.currentPage }
     var phase: PresentationTimeline.Phase { timeline.phase }
 
     func start() {
+        update { $0.start(at: $1) }
+    }
+
+    func start(pageCount: Int) {
+        timeline = PresentationTimeline(pageCount: pageCount)
         update { $0.start(at: $1) }
     }
 

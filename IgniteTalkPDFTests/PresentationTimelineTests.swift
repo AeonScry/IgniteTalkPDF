@@ -14,6 +14,22 @@ func startBeginsOnFirstPageWithFullInterval() {
 }
 
 @Test
+func shorterPresentationDividesTotalDurationEqually() {
+    var timeline = PresentationTimeline(pageCount: 10)
+
+    timeline.start(at: 0)
+    timeline.tick(at: 30)
+
+    #expect(timeline.currentPage == 1)
+    #expect(abs(timeline.secondsPerPage - 30) < 0.001)
+    #expect(abs(timeline.secondsRemaining(at: 30) - 30) < 0.001)
+
+    timeline.tick(at: 300)
+    #expect(timeline.phase == .finished)
+    #expect(timeline.currentPage == 9)
+}
+
+@Test
 func delayedTickCatchesUpWithoutAccumulatingDrift() {
     var timeline = PresentationTimeline()
     timeline.start(at: 100)

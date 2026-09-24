@@ -41,7 +41,7 @@ struct ContentView: View {
             VStack(spacing: 10) {
                 Text("IgniteTalkPDF")
                     .font(.system(size: 34, weight: .bold, design: .rounded))
-                Text("20 slides. 15 seconds each. Exactly 5 minutes.")
+                Text("5 minutes total, divided equally across your slides.")
                     .font(.title3)
                     .foregroundStyle(.secondary)
             }
@@ -100,7 +100,7 @@ struct ContentView: View {
         panel.allowedContentTypes = [.pdf]
         panel.allowsMultipleSelection = false
         panel.canChooseDirectories = false
-        panel.message = "Choose a PDF containing exactly 20 pages."
+        panel.message = "Choose a PDF for your presentation."
         if let lastDirectory = UserDefaults.standard.string(forKey: lastPDFDirectoryKey) {
             panel.directoryURL = URL(fileURLWithPath: lastDirectory, isDirectory: true)
         }
@@ -114,8 +114,8 @@ struct ContentView: View {
     }
 
     private func startPresentation() {
-        guard document != nil else { return }
-        session.start()
+        guard let document else { return }
+        session.start(pageCount: document.pageCount)
         isPresenting = true
         DispatchQueue.main.async {
             NSApplication.shared.keyWindow?.toggleFullScreen(nil)
@@ -149,10 +149,10 @@ struct ContentView: View {
             errorMessage = "The selected file could not be opened as a PDF."
             return
         }
-        guard candidate.pageCount == PresentationTimeline.pageCount else {
+        guard candidate.pageCount > 0 && candidate.pageCount <= PresentationTimeline.maximumPageCount else {
             document = nil
             selectedFileName = nil
-            errorMessage = "This PDF has \(candidate.pageCount) pages. Ignite talks require exactly 20 pages."
+            errorMessage = "This PDF has \(candidate.pageCount) pages. Choose a PDF with 1 to 20 pages."
             return
         }
 
@@ -240,7 +240,7 @@ private struct PresentationView: View {
 
     private var status: some View {
         HStack(spacing: 14) {
-            Text("\(session.timeline.pageNumber) / \(PresentationTimeline.pageCount)")
+            Text("\(session.timeline.pageNumber) / \(session.timeline.pageCount)")
                 .monospacedDigit()
             Text(statusTime)
                 .monospacedDigit()
