@@ -14,16 +14,16 @@ IgniteTalkPDF is a native macOS presentation app built for the Ignite format: a 
 ## Architecture
 
 ```mermaid
-flowchart TD
-    Launch["Launch app"] --> Select["Select PDF"]
-    Select --> Validate{"Between 1 and 20 pages?"}
-    Validate -- No --> Error["Show validation error"]
-    Validate -- Yes --> Session["Start presentation"]
-    Session --> Timeline["PresentationTimeline"]
-    Timeline --> Page["Display current PDF page"]
-    Page --> Controls["Pause, resume, navigate, or restart"]
-    Timeline --> Finish["Five-minute timer completes"]
-    Finish --> Logo["Show DODLogo"]
+graph TD
+  Launch[Launch app] --> Select[Select PDF]
+  Select --> Validate{1 to 20 pages?}
+  Validate -->|No| Error[Show validation error]
+  Validate -->|Yes| Session[Start presentation]
+  Session --> Timeline[PresentationTimeline]
+  Timeline --> Page[Display current page]
+  Page --> Controls[Pause, resume, navigate, restart]
+  Timeline --> Finish[Five-minute timer completes]
+  Finish --> Logo[Show DODLogo]
 ```
 
 ## Build and run
