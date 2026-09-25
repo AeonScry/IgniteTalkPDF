@@ -15,27 +15,15 @@ IgniteTalkPDF is a native macOS presentation app built for the Ignite format: a 
 
 ```mermaid
 flowchart TD
-    A[User launches app] --> B[ContentView]
-    B --> C[Choose PDF]
-    C --> D[Validate 1 to 20 pages]
-    D --> E[PresentationSession]
-    E --> F[PresentationTimeline]
-    F --> G[Timer-driven page progression]
-    G --> H[PDFPageView]
-    H --> I[Fullscreen presentation]
-    I --> J[Pause / Resume / Previous / Next / Restart]
-    J --> K[Finish state with DODLogo]
-
-    subgraph Core
-        E
-        F
-    end
-
-    subgraph UI
-        B
-        H
-        J
-    end
+    Launch["Launch app"] --> Select["Select PDF"]
+    Select --> Validate{"Between 1 and 20 pages?"}
+    Validate -- No --> Error["Show validation error"]
+    Validate -- Yes --> Session["Start presentation"]
+    Session --> Timeline["PresentationTimeline"]
+    Timeline --> Page["Display current PDF page"]
+    Page --> Controls["Pause, resume, navigate, or restart"]
+    Timeline --> Finish["Five-minute timer completes"]
+    Finish --> Logo["Show DODLogo"]
 ```
 
 ## Build and run
@@ -54,6 +42,16 @@ flowchart TD
 - The app exits fullscreen with the Escape key and can restart the presentation at any time.
 
 The last-used PDF folder is remembered in `UserDefaults`, so the chooser reopens in the same directory next time.
+
+## Timing
+
+Every presentation has a maximum duration of five minutes. The time assigned to each slide is calculated as:
+
+```text
+300 seconds / number of slides
+```
+
+For example, a 20-slide PDF displays each slide for 15 seconds, while a 10-slide PDF displays each slide for 30 seconds.
 
 ## Testing
 
